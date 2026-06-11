@@ -3,156 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Predictor</title>
+    <title>DiabetesGuard — AI Risk Predictor</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
 
-        .container {
-            background: white;
-            padding: 40px;
+        /* NAVBAR */
+        nav {
+            background: #fff;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 22px; font-weight: 800; color: #1a56db; }
+        .logo span { color: #111; }
+        .nav-tag {
+            background: #eff6ff;
+            color: #1a56db;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
+            padding: 50px 40px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero h1 { font-size: 40px; font-weight: 800; margin-bottom: 10px; }
+        .hero p { font-size: 16px; opacity: 0.85; margin-bottom: 0; }
+
+        /* MAIN LAYOUT */
+        .main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* CARDS */
+        .card {
+            background: #fff;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            width: 500px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
 
-        h1 {
-            text-align: center;
-            color: #2d3748;
-            margin-bottom: 8px;
+        .card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        p.subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 14px;
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        label {
+        .form-group label {
             display: block;
-            color: #4a5568;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
             margin-bottom: 6px;
-            font-weight: 500;
         }
 
-        input {
+        .form-group input {
             width: 100%;
             padding: 10px 14px;
-            border: 1px solid #e2e8f0;
+            border: 1.5px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
-            color: #2d3748;
+            color: #111;
             outline: none;
             transition: border 0.2s;
         }
 
-        input:focus {
-            border-color: #667eea;
+        .form-group input:focus { border-color: #1a56db; }
+        .form-group small {
+            display: block;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 3px;
         }
 
-        button {
+        .predict-btn {
             width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
+            padding: 14px;
+            background: #1a56db;
+            color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: #5a67d8;
-        }
-
-        .result {
-            text-align: center;
             margin-top: 20px;
-            padding: 16px;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .predict-btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26,86,219,0.3);
+        }
+
+        /* ERRORS */
+        .errors {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
             border-radius: 8px;
-            font-size: 18px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .errors p {
+            color: #dc2626;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        /* RESULT */
+        .result-card {
+            text-align: center;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .result-badge.diabetic {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .result-badge.not-diabetic {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        /* PROBABILITY */
+        .probability-section { margin: 20px 0; }
+
+        .prob-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
             font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
         }
 
-        .result.diabetic {
-            background: #fff5f5;
-            color: #e53e3e;
+        .progress-bar {
+            width: 100%;
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        .result.not-diabetic {
-            background: #f0fff4;
-            color: #38a169;
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .fill-green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .fill-orange { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .fill-red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        /* RISK LEVEL */
+        .risk-level {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            margin: 12px 0;
+        }
+
+        .risk-green { background: #f0fdf4; color: #16a34a; }
+        .risk-orange { background: #fffbeb; color: #d97706; }
+        .risk-red { background: #fef2f2; color: #dc2626; }
+
+        /* RISK FACTORS */
+        .risk-factors { margin-top: 20px; text-align: left; }
+
+        .risk-factors h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .factor-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #fef2f2;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .factor-item.safe {
+            background: #f0fdf4;
+        }
+
+        /* DISCLAIMER */
+        .disclaimer {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #92400e;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        /* MODEL COMPARISON */
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .model-table th {
+            background: #f9fafb;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 700;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .model-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+        }
+
+        .model-table tr:hover td { background: #f9fafb; }
+
+        .best-badge {
+            background: #eff6ff;
+            color: #1a56db;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .acc-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acc-fill {
+            height: 8px;
+            background: #1a56db;
+            border-radius: 4px;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state .icon { font-size: 50px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+
+        /* FULL WIDTH */
+        .full-width { grid-column: 1 / -1; }
+
+        @media (max-width: 768px) {
+            .main { grid-template-columns: 1fr; }
+            .full-width { grid-column: 1; }
+            .hero h1 { font-size: 28px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🩺 Diabetes Predictor</h1>
-        <p class="subtitle">Enter patient details to predict diabetes risk</p>
+
+<nav>
+    <div class="logo">Diabetes<span>Guard</span></div>
+    <div class="nav-tag">🤖 AI Powered</div>
+</nav>
+
+<div class="hero">
+    <h1>🩺 Diabetes Risk Predictor</h1>
+    <p>Enter patient medical parameters to assess diabetes risk using Machine Learning</p>
+</div>
+
+<div class="main">
+
+    <!-- INPUT FORM -->
+    <div class="card">
+        <h2>📋 Patient Information</h2>
+
+        {% if errors %}
+        <div class="errors">
+            {% for error in errors %}
+            <p>⚠️ {{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <form action="/predict" method="POST">
-            <div class="form-group">
-                <label>Pregnancies</label>
-                <input type="number" name="pregnancies" placeholder="e.g. 2" required>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Pregnancies</label>
+                    <input type="number" name="pregnancies" placeholder="0-20" min="0" max="20" required>
+                    <small>Number of times pregnant</small>
+                </div>
+                <div class="form-group">
+                    <label>Glucose Level</label>
+                    <input type="number" name="glucose" placeholder="50-300" min="50" max="300" required>
+                    <small>Plasma glucose (mg/dL)</small>
+                </div>
+                <div class="form-group">
+                    <label>Blood Pressure</label>
+                    <input type="number" name="bloodpressure" placeholder="30-150" min="30" max="150" required>
+                    <small>Diastolic (mm Hg)</small>
+                </div>
+                <div class="form-group">
+                    <label>Skin Thickness</label>
+                    <input type="number" name="skinthickness" placeholder="0-100" min="0" max="100" required>
+                    <small>Triceps skinfold (mm)</small>
+                </div>
+                <div class="form-group">
+                    <label>Insulin Level</label>
+                    <input type="number" name="insulin" placeholder="0-900" min="0" max="900" required>
+                    <small>2-Hour serum insulin</small>
+                </div>
+                <div class="form-group">
+                    <label>BMI</label>
+                    <input type="number" step="0.1" name="bmi" placeholder="10-70" min="10" max="70" required>
+                    <small>Body mass index</small>
+                </div>
+                <div class="form-group">
+                    <label>Diabetes Pedigree</label>
+                    <input type="number" step="0.001" name="dpf" placeholder="0-3" min="0" max="3" required>
+                    <small>Hereditary diabetes score</small>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" placeholder="1-120" min="1" max="120" required>
+                    <small>Patient age in years</small>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Glucose Level</label>
-                <input type="number" name="glucose" placeholder="e.g. 120" required>
-            </div>
-            <div class="form-group">
-                <label>Blood Pressure</label>
-                <input type="number" name="bloodpressure" placeholder="e.g. 70" required>
-            </div>
-            <div class="form-group">
-                <label>Skin Thickness</label>
-                <input type="number" name="skinthickness" placeholder="e.g. 20" required>
-            </div>
-            <div class="form-group">
-                <label>Insulin Level</label>
-                <input type="number" name="insulin" placeholder="e.g. 80" required>
-            </div>
-            <div class="form-group">
-                <label>BMI</label>
-                <input type="number" step="0.1" name="bmi" placeholder="e.g. 25.5" required>
-            </div>
-            <div class="form-group">
-                <label>Diabetes Pedigree Function</label>
-                <input type="number" step="0.001" name="dpf" placeholder="e.g. 0.5" required>
-            </div>
-            <div class="form-group">
-                <label>Age</label>
-                <input type="number" name="age" placeholder="e.g. 25" required>
-            </div>
-
-            <button type="submit">🔍 Predict</button>
+            <button type="submit" class="predict-btn">🔍 Analyze Diabetes Risk</button>
         </form>
+    </div>
+
+    <!-- RESULT -->
+    <div class="card result-card">
+        <h2>📊 Prediction Result</h2>
 
         {% if result %}
-            <div class="result {% if 'Not' in result %}not-diabetic{% else %}diabetic{% endif %}">
-                {{ result }}
+            <div class="result-badge {% if 'Not' in result %}not-diabetic{% else %}diabetic{% endif %}">
+                {% if 'Not' in result %}✅{% else %}⚠️{% endif %} {{ result }}
+            </div>
+
+            <div class="probability-section">
+                <div class="prob-label">
+                    <span>Diabetes Risk Probability</span>
+                    <span>{{ probability }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill fill-{{ risk_color }}"
+                         style="width: {{ probability }}%"></div>
+                </div>
+            </div>
+
+            <div class="risk-level risk-{{ risk_color }}">
+                Risk Level: {{ risk_level }}
+            </div>
+
+            <div class="risk-factors">
+                <h3>🔍 Contributing Risk Factors:</h3>
+                {% for factor in risk_factors %}
+                <div class="factor-item {% if 'No major' in factor %}safe{% endif %}">
+                    {% if 'No major' in factor %}✅{% else %}⚠️{% endif %} {{ factor }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="disclaimer">
+                ⚠️ This is an AI prediction tool only. Not a substitute for professional medical advice.
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <div class="icon">🏥</div>
+                <p>Fill in the patient details and click<br><strong>Analyze Diabetes Risk</strong></p>
             </div>
         {% endif %}
     </div>
+
+    <!-- MODEL COMPARISON -->
+    <div class="card full-width">
+        <h2>🤖 Model Performance Comparison</h2>
+        <table class="model-table">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Accuracy</th>
+                    <th>Performance</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for name, acc in model_results.items() %}
+                <tr>
+                    <td><strong>{{ name }}</strong></td>
+                    <td>{{ acc }}%</td>
+                    <td>
+                        <div class="acc-bar">
+                            <div class="acc-fill" style="width: {{ acc }}px"></div>
+                            <span style="font-size:12px;color:#6b7280">{{ acc }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if name == best_model_name %}
+                        <span class="best-badge">✅ Selected</span>
+                        {% else %}
+                        <span style="color:#9ca3af;font-size:12px">Not selected</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p style="font-size:12px;color:#9ca3af;margin-top:12px">
+            * Best performing model is automatically selected for predictions
+        </p>
+    </div>
+
+</div>
+
 </body>
 </html>
